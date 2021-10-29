@@ -1,4 +1,4 @@
-module OData exposing
+module OData4.Url exposing
     ( QueryOption, select, filter, orderBy, top, skip
     , Order, asc, desc
     , CommonExpression
@@ -11,7 +11,7 @@ module OData exposing
     , test
     )
 
-{-| Build Open Data Protocol (OData) queries in Elm.
+{-| Build Open Data Protocol (OData v4) queries in Elm.
 
 This package supports a _subset_ of OData 4.01
 [_query option_](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_CommonExpressionSyntax),
@@ -19,6 +19,7 @@ This package supports a _subset_ of OData 4.01
 [_primitive literal_](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_PrimitiveLiterals).
 
 <http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html>
+
 <http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html>
 
   - If you need a _query option_, _common expression_, or _primitive literal_

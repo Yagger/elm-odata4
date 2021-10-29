@@ -1,11 +1,11 @@
 {
     "type": "package",
-    "name": "Yagger/elm-odata",
-    "summary": "Build Open Data Protocol (OData) queries",
+    "name": "Yagger/elm-odata4",
+    "summary": "Build Open Data Protocol (OData v4) queries",
     "license": "MIT",
     "version": "1.0.0",
     "exposed-modules": [
-        "OData"
+        "OData4.Url"
     ],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {
