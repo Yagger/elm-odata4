@@ -1,4 +1,7 @@
 {
     "root": "../src",
-    "tests": ["OData4.Url"]
+    "tests": [
+        "OData4.Url",
+        "OData4.Internals"
+    ]
 }

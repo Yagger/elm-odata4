@@ -125,6 +125,7 @@ This package supports a _subset_ of OData 4.01
 
 -}
 
+import OData4.Internals
 import Time
 import Url.Builder
 
@@ -132,16 +133,10 @@ import Url.Builder
 {-| Test internals are needed for [`elm-verify-examples`](https://github.com/stoeffel/elm-verify-examples)
 -}
 test :
-    { dateStringFromPosix : Time.Posix -> String
-    , dateTimeStringFromPosix : Time.Posix -> String
-    , fromIntWithLeftZeroJust : Int -> String
-    , stringFromValue : Value -> String
+    { stringFromValue : Value -> String
     }
 test =
-    { dateStringFromPosix = dateStringFromPosix
-    , dateTimeStringFromPosix = dateTimeStringFromPosix
-    , fromIntWithLeftZeroJust = fromIntWithLeftZeroJust
-    , stringFromValue = stringFromValue
+    { stringFromValue = stringFromValue
     }
 
 
@@ -673,54 +668,54 @@ encodeOperator operator =
     FloatValue eq 34.95
     StringValue eq 'Say Hello,then go'
     DateValue eq 2012-12-03
-    DateTimeValue eq 2012-12-03T07:16:23
+    DateTimeOffsetValue eq 2012-12-03T07:16:23
     GuidValue eq 01234567-89ab-cdef-0123-456789abcdef
 
 -}
 type Value
-    = ValueNull
-    | ValueTrue
-    | ValueFalse
-    | ValueInt Int
-    | ValueFloat Float
-    | ValueString String
-    | ValueDate Time.Posix
-    | ValueDateTime Time.Posix
-    | ValueGuid String
-    | ValueCustom String
+    = NullValue
+    | TrueValue
+    | FalseValue
+    | IntValue Int
+    | FloatValue Float
+    | StringValue String
+    | DateValue Time.Posix
+    | DateTimeOffsetValue Time.Posix
+    | GuidValue String
+    | CustomValue String
 
 
 stringFromValue : Value -> String
 stringFromValue v =
     case v of
-        ValueNull ->
+        NullValue ->
             "null"
 
-        ValueTrue ->
+        TrueValue ->
             "true"
 
-        ValueFalse ->
+        FalseValue ->
             "false"
 
-        ValueInt i ->
+        IntValue i ->
             String.fromInt i
 
-        ValueFloat f ->
+        FloatValue f ->
             String.fromFloat f
 
-        ValueString s ->
+        StringValue s ->
             "'" ++ s ++ "'"
 
-        ValueDate posix ->
-            dateStringFromPosix posix
+        DateValue posix ->
+            OData4.Internals.dateStringFromPosix posix
 
-        ValueDateTime posix ->
-            dateTimeStringFromPosix posix
+        DateTimeOffsetValue posix ->
+            OData4.Internals.dateTimeOffsetStringFromPosix posix
 
-        ValueGuid s ->
+        GuidValue s ->
             s
 
-        ValueCustom s ->
+        CustomValue s ->
             s
 
 
@@ -733,7 +728,7 @@ stringFromValue v =
 -}
 null : Value
 null =
-    ValueNull
+    NullValue
 
 
 {-|
@@ -745,7 +740,7 @@ null =
 -}
 true : Value
 true =
-    ValueTrue
+    TrueValue
 
 
 {-|
@@ -757,7 +752,7 @@ true =
 -}
 false : Value
 false =
-    ValueFalse
+    FalseValue
 
 
 {-|
@@ -769,7 +764,7 @@ false =
 -}
 int : Int -> Value
 int i =
-    ValueInt i
+    IntValue i
 
 
 {-|
@@ -781,7 +776,7 @@ int i =
 -}
 float : Float -> Value
 float f =
-    ValueFloat f
+    FloatValue f
 
 
 {-| _Note the single quotes_
@@ -793,7 +788,7 @@ float f =
 -}
 string : String -> Value
 string s =
-    ValueString s
+    StringValue s
 
 
 {-|
@@ -807,7 +802,7 @@ string s =
 -}
 date : Time.Posix -> Value
 date posix =
-    ValueDate posix
+    DateValue posix
 
 
 {-|
@@ -816,12 +811,12 @@ date posix =
 
     dateTime (Time.millisToPosix 1631124861000)
     |> test.stringFromValue
-    --> "2021-09-08T18:14:21"
+    --> "2021-09-08T18:14:21Z"
 
 -}
 dateTime : Time.Posix -> Value
 dateTime posix =
-    ValueDateTime posix
+    DateTimeOffsetValue posix
 
 
 {-|
@@ -833,7 +828,7 @@ dateTime posix =
 -}
 guid : String -> Value
 guid s =
-    ValueGuid s
+    GuidValue s
 
 
 {-| In situations like this <https://github.com/microsoftgraph/microsoft-graph-docs/issues/14547>,
@@ -853,109 +848,7 @@ In the example below, date needs to be treated as string (with single quotes):
 -}
 customValue : (String -> String) -> Value -> Value
 customValue f v =
-    ValueCustom (f (stringFromValue v))
-
-
-
--- Date and Time
-
-
-{-|
-
-    import Time
-
-    Time.millisToPosix 1631124861000
-    |> test.dateStringFromPosix
-    --> "2021-09-08"
-
--}
-dateStringFromPosix : Time.Posix -> String
-dateStringFromPosix posix =
-    String.fromInt (Time.toYear Time.utc posix)
-        ++ "-"
-        ++ (case Time.toMonth Time.utc posix of
-                Time.Jan ->
-                    "01"
-
-                Time.Feb ->
-                    "02"
-
-                Time.Mar ->
-                    "03"
-
-                Time.Apr ->
-                    "04"
-
-                Time.May ->
-                    "05"
-
-                Time.Jun ->
-                    "06"
-
-                Time.Jul ->
-                    "07"
-
-                Time.Aug ->
-                    "08"
-
-                Time.Sep ->
-                    "09"
-
-                Time.Oct ->
-                    "10"
-
-                Time.Nov ->
-                    "11"
-
-                Time.Dec ->
-                    "12"
-           )
-        ++ "-"
-        ++ fromIntWithLeftZeroJust (Time.toDay Time.utc posix)
-
-
-{-|
-
-    import Time
-
-    Time.millisToPosix 1631124861000
-    |> test.dateTimeStringFromPosix
-    --> "2021-09-08T18:14:21"
-
--}
-dateTimeStringFromPosix : Time.Posix -> String
-dateTimeStringFromPosix posix =
-    dateStringFromPosix posix
-        ++ "T"
-        ++ fromIntWithLeftZeroJust (Time.toHour Time.utc posix)
-        ++ ":"
-        ++ fromIntWithLeftZeroJust (Time.toMinute Time.utc posix)
-        ++ ":"
-        ++ fromIntWithLeftZeroJust (Time.toSecond Time.utc posix)
-
-
-{-|
-
-    test.fromIntWithLeftZeroJust 0
-    --> "00"
-
-    test.fromIntWithLeftZeroJust 5
-    --> "05"
-
-    test.fromIntWithLeftZeroJust 15
-    --> "15"
-
--}
-fromIntWithLeftZeroJust : Int -> String
-fromIntWithLeftZeroJust i =
-    String.fromInt i
-        |> (\s ->
-                if String.length s < 2 then
-                    "0" ++ s
-
-                else
-                    s
-           )
+    CustomValue (f (stringFromValue v))
 
 
 
