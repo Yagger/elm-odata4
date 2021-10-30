@@ -3,7 +3,7 @@
     "name": "Yagger/elm-odata4",
     "summary": "Build Open Data Protocol (OData v4) queries",
     "license": "MIT",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "exposed-modules": [
         "OData4.Url"
     ],

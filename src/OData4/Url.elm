@@ -668,7 +668,7 @@ encodeOperator operator =
     FloatValue eq 34.95
     StringValue eq 'Say Hello,then go'
     DateValue eq 2012-12-03
-    DateTimeOffsetValue eq 2012-12-03T07:16:23
+    DateTimeOffsetValue eq 2012-12-03T07:16:23Z
     GuidValue eq 01234567-89ab-cdef-0123-456789abcdef
 
 -}
