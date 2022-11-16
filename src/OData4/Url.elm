@@ -1,5 +1,5 @@
 module OData4.Url exposing
-    ( QueryOption, select, filter, orderBy, top, skip
+    ( QueryOption, select, expand, filter, orderBy, top, skip
     , Order, asc, desc
     , CommonExpression
     , eq, ne, gt, ge, lt, le, and, or, not_, in_
@@ -76,7 +76,7 @@ This package supports a _subset_ of OData 4.01
 
 # Query Options
 
-@docs QueryOption, select, filter, orderBy, top, skip
+@docs QueryOption, select, expand, filter, orderBy, top, skip
 
 
 # Order
@@ -149,6 +149,7 @@ are query string parameters that control the amount and order of the data return
 -}
 type QueryOption
     = Select (List String)
+    | Expand (List String)
     | Filter CommonExpression
     | OrderBy (List ( String, Maybe Order ))
     | Top Int
@@ -169,6 +170,22 @@ system query option requests that the service return only the properties explici
 select : List String -> QueryOption
 select attrs =
     Select attrs
+
+
+{-| The [`$expand`](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionexpand)
+system query option indicates the related entities and stream values that MUST be represented inline.
+
+    import Url
+    import Url.Builder
+
+    expand [ "calendar", "meeting" ]
+    |> toQueryParameter >> List.singleton >> Url.Builder.toQuery >> Url.percentDecode
+    --> Just "?$expand=calendar,meeting"
+
+-}
+expand : List String -> QueryOption
+expand attrs =
+    Expand attrs
 
 
 {-| The [`$filter`](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionfilter)
@@ -872,6 +889,9 @@ toQueryParameter queryParameter =
     case queryParameter of
         Select attrs ->
             Url.Builder.string "$select" (String.join "," attrs)
+
+        Expand attrs ->
+            Url.Builder.string "$expand" (String.join "," attrs)
 
         Filter ops ->
             Url.Builder.string "$filter" (encodeOperator ops)
